@@ -1,0 +1,42 @@
+# Render Blueprint — deploys the Django backend on the free plan.
+# Database: use an external Neon Postgres (set DATABASE_URL) — keeps it free & persistent.
+# In the Render dashboard: New + → Blueprint → pick this repo. Then fill the
+# "sync: false" env vars (marked below) with your real values.
+services:
+  - type: web
+    name: fitjourney-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: >-
+      pip install -r requirements.txt &&
+      python manage.py collectstatic --no-input &&
+      python manage.py migrate &&
+      python manage.py seed_data
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    healthCheckPath: /api/docs/
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: DJANGO_DEBUG
+        value: "0"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true            # Render generates a strong secret
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false                    # e.g. fitjourney-api.onrender.com
+      - key: DATABASE_URL
+        sync: false                    # paste your Neon connection string
+      - key: CLOUDINARY_URL
+        sync: false                    # cloudinary://<key>:<secret>@<cloud-name>
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false                    # e.g. https://your-app.vercel.app
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false                    # e.g. https://your-app.vercel.app
+      - key: GROQ_API_KEY
+        sync: false                    # enables the real AI Coach chatbot (Groq)
+      - key: GROQ_MODEL
+        value: "llama-3.3-70b-versatile"
+      - key: ADMIN_EMAIL
+        sync: false                    # optional: seed an admin (else none is created)
+      - key: ADMIN_PASSWORD
+        sync: false                    # required to seed an admin in production

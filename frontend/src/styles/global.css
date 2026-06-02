@@ -1,0 +1,261 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Ascend AI — Design System
+   Dark-first theme via CSS custom properties.
+   ============================================================ */
+:root {
+  /* RGB channels — consumed by Tailwind via rgb(var(--x-rgb) / <alpha>) */
+  --bg-rgb: 7 7 11;
+  --surface-rgb: 13 13 20;
+  --card-rgb: 18 18 28;
+  --text-rgb: 244 244 247;
+  --muted-rgb: 138 138 154;
+  --accent-rgb: 124 92 255;
+  --border-rgb: 255 255 255; /* used at low alpha for hairline borders */
+  --success-rgb: 52 211 153;
+  --warning-rgb: 251 191 36;
+  --danger-rgb: 248 113 113;
+
+  /* Hex/rgba convenience tokens — consumed directly in CSS & inline styles */
+  --bg: rgb(7 7 11);
+  --surface: rgb(13 13 20);
+  --card: rgb(18 18 28);
+  --text: rgb(244 244 247);
+  --muted: rgb(138 138 154);
+  --accent: #7c5cff;
+  --accent-soft: rgba(124, 92, 255, 0.35);
+  --border: rgba(255, 255, 255, 0.08);
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+
+  /* Glass surface tints (theme-aware) */
+  --glass-top: rgba(255, 255, 255, 0.06);
+  --glass-bottom: rgba(255, 255, 255, 0.02);
+  --glass-shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.5);
+
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-snappy: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Optional light theme (toggle by removing .dark on <html>) */
+:root:not(.dark) {
+  --bg-rgb: 246 247 251;
+  --surface-rgb: 255 255 255;
+  --card-rgb: 255 255 255;
+  --text-rgb: 17 17 26;
+  --muted-rgb: 107 107 123;
+  --border-rgb: 0 0 0;
+
+  --bg: rgb(246 247 251);
+  --surface: rgb(255 255 255);
+  --card: rgb(255 255 255);
+  --text: rgb(17 17 26);
+  --muted: rgb(71 85 105);
+  --border: rgba(15, 23, 42, 0.1);
+
+  /* Higher-opacity glass so cards stay visible on light backgrounds. */
+  --glass-top: rgba(255, 255, 255, 0.9);
+  --glass-bottom: rgba(255, 255, 255, 0.75);
+  --glass-shadow: 0 10px 30px -16px rgba(15, 23, 42, 0.25);
+}
+
+/* Soften the ambient backdrop in light mode. */
+:root:not(.dark) body::before {
+  opacity: 0.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.4s var(--ease-snappy), color 0.4s var(--ease-snappy);
+}
+
+/* Smooth theme crossfade for surfaces. */
+.card,
+.glass,
+.input,
+.btn-ghost,
+.chip {
+  transition: background-color 0.4s var(--ease-snappy), border-color 0.4s var(--ease-snappy),
+    color 0.4s var(--ease-snappy), box-shadow 0.4s var(--ease-snappy);
+}
+
+/* Ambient gradient backdrop */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(60rem 60rem at 15% -10%, rgba(124, 92, 255, 0.18), transparent 60%),
+    radial-gradient(50rem 50rem at 100% 0%, rgba(34, 211, 238, 0.12), transparent 55%);
+  pointer-events: none;
+}
+
+/* When Lenis is active it sets this class on <html> */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+
+@layer components {
+  .glass {
+    background: linear-gradient(180deg, var(--glass-top), var(--glass-bottom));
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--border);
+  }
+
+  .card {
+    @apply glass rounded-2xl;
+    box-shadow: var(--glass-shadow);
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5
+           text-sm font-semibold transition-all duration-300 ease-smooth
+           disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn text-white;
+    background: linear-gradient(135deg, var(--accent), #22d3ee);
+    box-shadow: 0 8px 30px -8px var(--accent-soft);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px -10px var(--accent-soft);
+  }
+  .btn-ghost {
+    @apply btn border border-border text-text hover:bg-white/5;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-border bg-surface/60 px-4 py-3 text-sm
+           text-text placeholder:text-muted outline-none transition
+           focus:border-accent focus:ring-2 focus:ring-accent/30;
+  }
+
+  .label {
+    @apply mb-1.5 block text-xs font-medium uppercase tracking-wide text-muted;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-border
+           bg-white/5 px-3 py-1 text-xs font-medium text-muted;
+  }
+}
+
+/* Animated aurora background (dashboard) */
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.5;
+  will-change: transform;
+}
+.aurora-1 {
+  width: 36rem;
+  height: 36rem;
+  top: -10rem;
+  inset-inline-start: -8rem;
+  background: radial-gradient(circle, rgba(124, 92, 255, 0.45), transparent 70%);
+  animation: aurora-float-1 22s var(--ease-snappy) infinite alternate;
+}
+.aurora-2 {
+  width: 30rem;
+  height: 30rem;
+  top: 20%;
+  inset-inline-end: -6rem;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.35), transparent 70%);
+  animation: aurora-float-2 26s var(--ease-snappy) infinite alternate;
+}
+.aurora-3 {
+  width: 28rem;
+  height: 28rem;
+  bottom: -8rem;
+  inset-inline-start: 30%;
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.25), transparent 70%);
+  animation: aurora-float-3 30s var(--ease-snappy) infinite alternate;
+}
+:root:not(.dark) .aurora-blob {
+  opacity: 0.35;
+}
+@keyframes aurora-float-1 {
+  to { transform: translate3d(8rem, 4rem, 0) scale(1.15); }
+}
+@keyframes aurora-float-2 {
+  to { transform: translate3d(-6rem, 5rem, 0) scale(1.2); }
+}
+@keyframes aurora-float-3 {
+  to { transform: translate3d(4rem, -5rem, 0) scale(1.1); }
+}
+
+/* Gradient text helper */
+.text-gradient {
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 55%, #22d3ee 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Reveal animation base (used by Motion One / IntersectionObserver) */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.8s var(--ease-smooth), transform 0.8s var(--ease-smooth);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
