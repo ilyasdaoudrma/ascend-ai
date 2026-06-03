@@ -8,8 +8,8 @@ export function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const login = useAuthStore((s) => s.login);
-  const [email, setEmail] = useState("demo@fitjourney.ai");
-  const [password, setPassword] = useState("demo12345");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -55,7 +55,6 @@ export function LoginPage() {
         <button type="submit" className="btn-primary w-full py-3" disabled={loading}>
           {loading ? t("auth.loggingIn") : t("auth.login")}
         </button>
-        <p className="text-center text-xs text-muted">{t("auth.demoHint")}</p>
       </form>
     </AuthShell>
   );
