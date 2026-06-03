@@ -82,15 +82,18 @@ class SocialFlowTests(TestCase):
         self.assertFalse(msgs[0]["is_mine"])
         self.assertEqual(bob_client.get("/api/v1/social/chat/unread_count/").data["unread"], 0)
 
-    def test_friend_request_accept(self):
+    def test_add_friend_is_instant_and_mutual(self):
         resp = self.client.post("/api/v1/social/friends/request_friend/", {"username": self.bob.username}, format="json")
         self.assertEqual(resp.status_code, 201)
-        fid = resp.data["id"]
+        # Alice sees Bob as a friend immediately (no acceptance needed).
+        self.assertEqual(len(self.client.get("/api/v1/social/friends/").data), 1)
+        # Bob sees Alice as a friend too (mutual) and gets a notification.
         bob_client = APIClient()
         bob_client.force_authenticate(self.bob)
-        self.assertEqual(len(bob_client.get("/api/v1/social/friends/requests/").data), 1)
-        bob_client.post(f"/api/v1/social/friends/{fid}/accept/")
         self.assertEqual(len(bob_client.get("/api/v1/social/friends/").data), 1)
+        self.assertTrue(
+            Notification.objects.filter(recipient=self.bob, kind="friend").exists()
+        )
 
     def test_groups_join_leave(self):
         resp = self.client.post("/api/v1/social/groups/", {"name": "Calisthenics Crew", "description": "x"}, format="json")

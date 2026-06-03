@@ -12,8 +12,12 @@ export function FriendsPage() {
   const { t } = useTranslation();
   const { data: friends = [] } = useFriends();
   const { data: requests = [] } = useFriendRequests();
-  const { data: suggested = [] } = useSuggestedUsers();
+  const { data: suggestedRaw = [] } = useSuggestedUsers();
   const { sendRequest, accept, decline } = useFriendActions();
+
+  // Drop people who are already friends from the "people you may know" list.
+  const friendIds = new Set(friends.map((f) => f.id));
+  const suggested = suggestedRaw.filter((u) => !friendIds.has(u.id));
 
   return (
     <div className="space-y-8">

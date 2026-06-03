@@ -196,6 +196,7 @@ export function useFriendActions() {
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["friends"] });
     qc.invalidateQueries({ queryKey: ["friend-requests"] });
+    qc.invalidateQueries({ queryKey: ["suggested-users"] });
   };
   return {
     sendRequest: useMutation({

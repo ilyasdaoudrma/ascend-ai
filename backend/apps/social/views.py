@@ -230,14 +230,27 @@ class FriendshipViewSet(mixins.DestroyModelMixin, viewsets.GenericViewSet):
         target = get_object_or_404(User, username=request.data.get("username"))
         if target == request.user:
             return Response({"detail": "You cannot friend yourself."}, status=400)
-        friendship, created = Friendship.objects.get_or_create(
-            from_user=request.user, to_user=target,
-            defaults={"status": Friendship.Status.PENDING},
-        )
+        # Friendship is immediate & mutual (like a follow). Reuse any existing
+        # row in either direction and mark it accepted.
+        existing = Friendship.objects.filter(
+            Q(from_user=request.user, to_user=target)
+            | Q(from_user=target, to_user=request.user)
+        ).first()
+        if existing:
+            if existing.status != Friendship.Status.ACCEPTED:
+                existing.status = Friendship.Status.ACCEPTED
+                existing.save(update_fields=["status"])
+            friendship, created = existing, False
+        else:
+            friendship = Friendship.objects.create(
+                from_user=request.user, to_user=target,
+                status=Friendship.Status.ACCEPTED,
+            )
+            created = True
         if created:
             Notification.objects.create(
                 recipient=target, actor=request.user, kind=Notification.Kind.FRIEND,
-                message=f"{request.user.full_name or request.user.email} sent you a friend request.",
+                message=f"{request.user.full_name or request.user.email} added you as a friend.",
                 link="/dashboard/friends",
             )
         return Response(FriendshipSerializer(friendship).data, status=status.HTTP_201_CREATED)
