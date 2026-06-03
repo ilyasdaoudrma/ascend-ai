@@ -1,12 +1,19 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import path, include
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
     SpectacularRedocView,
 )
+
+
+def health(_request):
+    """Root health check (used by hosting platforms) — returns 200."""
+    return JsonResponse({"status": "ok", "service": "Ascend AI API", "docs": "/api/docs/"})
+
 
 api_v1 = [
     path("auth/", include("apps.accounts.urls")),
@@ -17,6 +24,7 @@ api_v1 = [
 ]
 
 urlpatterns = [
+    path("", health),
     path("django-admin/", admin.site.urls),
     path("api/v1/", include((api_v1, "api"), namespace="v1")),
     # API schema & docs
