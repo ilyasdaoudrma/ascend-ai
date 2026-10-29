@@ -35,7 +35,7 @@ services:
       - key: GROQ_API_KEY
         sync: false                    # enables the real AI Coach chatbot (Groq)
       - key: GROQ_MODEL
-        value: "llama-3.3-70b-versatile"
+        value: "openai/gpt-oss-120b"
       - key: ADMIN_EMAIL
         sync: false                    # optional: seed an admin (else none is created)
       - key: ADMIN_PASSWORD

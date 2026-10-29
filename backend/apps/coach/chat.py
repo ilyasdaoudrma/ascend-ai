@@ -6,7 +6,7 @@ it returns a context-aware fallback so the feature still works in dev/demo.
 
 Set ONE of these env vars to enable the real chatbot (both use the OpenAI-compatible
 chat-completions schema, so the calling code is identical):
-    GROQ_API_KEY     (+ optional GROQ_MODEL,   default llama-3.3-70b-versatile)
+    GROQ_API_KEY     (+ optional GROQ_MODEL,   default openai/gpt-oss-120b)
     OPENAI_API_KEY   (+ optional OPENAI_MODEL, default gpt-4o-mini)
 
 GROQ takes priority if both are set. The call uses the stdlib only (urllib) so no
@@ -30,7 +30,7 @@ def _llm_config() -> dict | None:
             "provider": "groq",
             "key": groq,
             "url": "https://api.groq.com/openai/v1/chat/completions",
-            "model": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+            "model": os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
         }
     openai = os.getenv("OPENAI_API_KEY")
     if openai:

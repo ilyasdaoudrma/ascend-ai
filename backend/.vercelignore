@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+*.log
+db.sqlite3
+mediafiles
+staticfiles
+__pycache__
+.venv
